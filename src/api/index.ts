@@ -16,6 +16,8 @@ export interface Result {
     dynasty: string
 }
 
+export type NameData = GuWen & { name: string }
+
 type Category = 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
 
 const api = axios.create({
@@ -35,7 +37,7 @@ async function getAll(url: Category) {
 
 async function getGuwen(url: Category, filter?: string) {
     const data = await getAll(url)
-    const result = data.map(item => {
+    return data.map(item => {
         const content = item.content
             .replace(/(。|？|！|；)/g, '|')
             .replace(/(“|”)/g, '')
@@ -48,8 +50,7 @@ async function getGuwen(url: Category, filter?: string) {
             author: item.author || '佚名',
             content: filter ? content.filter(s => s.includes(filter)) : content,
         }
-    }).filter(item => item.content.length)
-    return result
+    }).filter(item => item.content.length > 3)
 }
 
 export { getGuwen }

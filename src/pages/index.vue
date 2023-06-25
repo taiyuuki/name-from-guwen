@@ -1,70 +1,51 @@
 <script setup lang="ts">
-import type { Result } from 'src/api'
+import type { NameData } from 'src/api'
 import { getGuwen } from 'src/api'
 import { arr_random } from '@taiyuuki/utils'
-import { removePunctuation, getRandomName } from 'src/utils'
+import { getRandomName, removePunctuation } from 'src/utils'
 
 const keyword = ref('')
 const count = ref(6)
 
-keyword.value = '瑶'
+keyword.value = ''
 
-const guwen = ref<Result>({
-    content: [],
-    author: '',
-    book: '',
-    dynasty: '',
-    title: '',
-})
-
-const textArray = computed(() => {
-    if (guwen.value.content.length === 0) {
-        return []
-    }
-    return arr_random(guwen.value.content).split('')
-})
-
-const randomChar = computed(() => {
-    const rName = removePunctuation(textArray.value.join('')).replaceAll(keyword.value, '')
-    return arr_random(rName.split(''))
-})
-
-const names = computed(() => {
-    return Array.from({ length: count.value }).map(() => getRandomName(keyword.value, randomChar.value))
-})
+const guwen = ref<NameData[]>([])
 
 function getText() {
-    getGuwen('songci', keyword.value).then(data => {
-        guwen.value = arr_random(data)
+    getGuwen('songci', keyword.value || void 0).then(data => {
+        const set = new Set<NameData>()
+        while (set.size < count.value && set.size < data.length) {
+            const result = arr_random(data)
+            const content = arr_random(result.content)
+            const text = removePunctuation(content).replaceAll(keyword.value, '').split('')
+            let name_1 = arr_random(text)
+            if (name_1 === '') {
+                name_1 = arr_random(text)
+            }
+            let name_2 = keyword.value === '' ? arr_random(text) : keyword.value
+            while (name_1 === name_2) {
+                name_2 = arr_random(text)
+            }
+            set.add({
+                ...result,
+                content,
+                name: getRandomName(name_1, name_2),
+            })
+        }
+        guwen.value = [...set]
     })
 }
 </script>
 
 <template>
-  <div v-if="textArray.length > 0">
-    <span
-      v-for="(text, index) in textArray"
-      :key="index"
-      :class="{ 'text-red': text === keyword || text === randomChar }"
-    >{{ text }}</span>
-  </div>
   <button @click="getText">
     生成
   </button>
-  <div v-show="randomChar">
-    <div
-      v-for="(name, index) in names"
+  <div>
+    <NameCard
+      v-for="(nameData, index) in guwen"
       :key="index"
-    >
-      {{ name }}
-    </div>
+      :name-data="nameData"
+    />
   </div>
 </template>
-
-<style lang="scss">
-.text-red {
-  color: #ec2b24;
-  font-weight: bold;
-  font-size: 20px;
-}
-</style>

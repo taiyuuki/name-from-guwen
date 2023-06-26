@@ -1,3 +1,4 @@
+import { deep_equal } from '@taiyuuki/utils'
 import axios from 'axios'
 
 export interface GuWen {
@@ -16,30 +17,35 @@ export interface Result {
     dynasty: string
 }
 
-export type NameData = GuWen & { name: string }
+export type NameData = GuWen & { name: [string, string] }
 
-type Category = 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
+export type Category = 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
+
+export type CategoryCheck = Record<Category, boolean>
 
 const api = axios.create({
     baseURL: process.env.BASE_URL,
 })
 
-let last = ''
+const last: Category[] = []
 let data: GuWen[] = []
-async function getAll(url: Category) {
-    if (last !== url || data.length === 0) {
-        last = url
-        const res = await api.get<GuWen[]>(`/json/${url}.json`)
-        data = res.data
+async function getAll(list: Category[]) {
+    if (!deep_equal(last, list) || data.length === 0) {
+        data = []
+        last.push(...list)
+        for await (const item of list) {
+            const res = await api.get<GuWen[]>(`/json/${item}.json`)
+            data.push(...res.data)
+        }
     }
     return data
 }
 
-async function getGuwen(url: Category, filter?: string) {
-    const data = await getAll(url)
+async function getGuwen(list: Category[], filter?: string) {
+    const data = await getAll(list)
     return data.map(item => {
         const content = item.content
-            .replace(/(。|？|！|；)/g, '|')
+            .replace(/(。|？|！|；)/g, '$1|')
             .replace(/(“|”)/g, '')
             .replace(/(\(|（).+?(\)|）)/g, '')
             .replace(/\|$/, '')
@@ -50,7 +56,7 @@ async function getGuwen(url: Category, filter?: string) {
             author: item.author || '佚名',
             content: filter ? content.filter(s => s.includes(filter)) : content,
         }
-    }).filter(item => item.content.length > 3)
+    }).filter(item => item.content.length)
 }
 
 export { getGuwen }

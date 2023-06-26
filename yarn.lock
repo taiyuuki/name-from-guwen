@@ -1308,6 +1308,11 @@
     eslint-plugin-jsonc "^2.8.0"
     jsonc-eslint-parser "^2.3.0"
 
+"@taiyuuki/unocss-preset@^0.0.4":
+  version "0.0.4"
+  resolved "https://registry.yarnpkg.com/@taiyuuki/unocss-preset/-/unocss-preset-0.0.4.tgz#14f33e7a57c14ee0c51a5f93a4944ebb2c87c772"
+  integrity sha512-F2GODIelWmmrg9SA5I5f5vu4IF9Fs4bFdNmQEevd7JU9L4tgYF9JZg5cw1YVuEuT+NeDgLspdurDV5PBTs2q8g==
+
 "@taiyuuki/utils@^0.4.3":
   version "0.4.3"
   resolved "https://registry.yarnpkg.com/@taiyuuki/utils/-/utils-0.4.3.tgz#020ea734cf9952fe66857f9f28d1d1e8fd672d67"

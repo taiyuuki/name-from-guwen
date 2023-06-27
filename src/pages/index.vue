@@ -1,35 +1,52 @@
 <script setup lang="ts">
-import type { Category, CategoryCheck, NameData } from 'src/api'
+import type { Category, NameData } from 'src/api'
 import { getGuwen } from 'src/api'
-import { arr_random, object_keys } from '@taiyuuki/utils'
+import { arr_random } from '@taiyuuki/utils'
 import { removePunctuation } from 'src/utils'
+import { e } from 'unocss'
 
 const keyword = ref('')
 const count = ref(8)
-const categoryList = ref<CategoryCheck>({
-    chuci: true,
-    shijing: true,
-    songci: true,
-    yuefu: true,
-    cifu: true,
-    gushi: true,
-})
-const category = computed(() => {
-    const result: Category[] = []
-    object_keys(categoryList.value).forEach(key => {
-        if (categoryList.value[key]) {
-            result.push(key)
-        }
-    })
-    return result
-})
+const category = [
+    {
+        name: 'tangshi',
+        lable: '唐诗',
+    },
+    {
+        name: 'songci',
+        lable: '宋词',
+    },
+    {
+        name: 'yuefu',
+        lable: '乐府诗',
+    },
+    {
+        name: 'cifu',
+        lable: '词赋',
+    },
+    {
+        name: 'shijing',
+        lable: '诗经',
+    },
+    {
+        name: 'chuci',
+        lable: '楚辞',
+    },
+    {
+        name: 'gushi',
+        lable: '古诗',
+    },
+]
+const checkList = ref<(Category | 'no')[]>(['tangshi', 'songci', 'yuefu', 'cifu', 'shijing', 'chuci', 'gushi'])
 
-keyword.value = '玉'
+const searchList = computed(() => {
+    return checkList.value.filter(item => item !== 'no') as Category[]
+})
 
 const guwen = ref<NameData[]>([])
 
 function getText() {
-    getGuwen(category.value, keyword.value || void 0).then(data => {
+    getGuwen(searchList.value, keyword.value || void 0).then(data => {
         const set = new Set<NameData>()
         while (set.size < count.value && set.size < data.length) {
             const result = arr_random(data)
@@ -58,17 +75,39 @@ function getText() {
         guwen.value = [...set]
     })
 }
+
+function check(value: Category | 'no') {
+    if (value === 'no' && searchList.value.length === 0) {
+        checkList.value = ['tangshi', 'songci', 'yuefu', 'cifu', 'shijing', 'chuci', 'gushi']
+    }
+}
+
+function validKeyword(value: string) {
+    const reg = /^[\u4e00-\u9fa5]$/g
+    return value === '' || reg.test(value) || '请输入单个汉字'
+}
 </script>
 
 <template>
   <div class="q-gutter-sm">
+    <q-input
+      v-model="keyword"
+      outlined
+      type="text"
+      :rules="[validKeyword]"
+      maxlength="1"
+      label="关键字"
+    />
     <q-checkbox
-      v-for="(_, key) in categoryList"
-      :key="key"
-      v-model="categoryList[key]"
+      v-for="(item, i) in category"
+      :key="item.name"
+      v-model="checkList[i]"
       dense
-      :label="key"
+      :label="item.lable"
       color="teal"
+      :true-value="item.name"
+      false-value="no"
+      @update:model-value="check"
     />
   </div>
   <button @click="getText">

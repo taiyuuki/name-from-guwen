@@ -19,7 +19,7 @@ export interface Result {
 
 export type NameData = GuWen & { name: [string, string] }
 
-export type Category = 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
+export type Category = 'tangshi' | 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
 
 export type CategoryCheck = Record<Category, boolean>
 
@@ -27,12 +27,13 @@ const api = axios.create({
     baseURL: process.env.BASE_URL,
 })
 
-const last: Category[] = []
+let lastest: Category[] = []
 let data: GuWen[] = []
 async function getAll(list: Category[]) {
-    if (!deep_equal(last, list) || data.length === 0) {
+    if (!deep_equal(lastest, list) || data.length === 0) {
         data = []
-        last.push(...list)
+        lastest = []
+        lastest.push(...list)
         for await (const item of list) {
             const res = await api.get<GuWen[]>(`/json/${item}.json`)
             data.push(...res.data)

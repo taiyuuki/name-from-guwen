@@ -3,7 +3,6 @@ import type { Category, NameData } from 'src/api'
 import { getGuwen } from 'src/api'
 import { arr_random } from '@taiyuuki/utils'
 import { removePunctuation } from 'src/utils'
-import { e } from 'unocss'
 
 const keyword = ref('')
 const count = ref(8)

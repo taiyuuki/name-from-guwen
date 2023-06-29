@@ -8,6 +8,12 @@ const props = defineProps<{
 const textList = computed(() => {
     return props.nameData.content.split('')
 })
+
+const left = ref(true)
+
+const toggle = () => {
+    left.value = !left.value
+}
 </script>
 
 <template>
@@ -28,16 +34,26 @@ const textList = computed(() => {
       display="inline-block"
     >
       <div
-        pst="abs l--50%"
+        pst="abs"
+        transition-all
+        :class="{ 'l-50': left, 'r-50': !left }"
       >
         {{ nameData.name[0] }}
       </div>
       <div
-        pst="abs l-50%"
+        pst="abs"
+        transition-all
+        :class="{ 'r-50': left, 'l-50': !left }"
       >
         {{ nameData.name[1] }}
       </div>
-      <div class="i-" />
+      <div
+        class="i-ic:round-swap-horizontal-circle"
+        pst="abs l-150%"
+        pointer
+        hover="text-red"
+        @click="toggle"
+      />
     </div>
     <div m="t-3rem">
       <span
@@ -55,5 +71,13 @@ const textList = computed(() => {
   color: #ec2b24;
   font-weight: bold;
   font-size: 20px;
+}
+
+.l-50 {
+  left: -50%;
+}
+
+.r-50 {
+  left: 50%;
 }
 </style>

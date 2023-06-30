@@ -1,9 +1,12 @@
 <script setup lang="ts">
+import { copy_text } from '@taiyuuki/utils'
 import type { NameData } from 'src/api'
 
 const props = defineProps<{
     nameData: NameData
 }>()
+
+const $q = useQuasar()
 
 const textList = computed(() => {
     return props.nameData.content.split('')
@@ -14,13 +17,25 @@ const left = ref(true)
 const toggle = () => {
     left.value = !left.value
 }
+
+function copyText() {
+    const text = left.value
+        ? `${props.nameData.name[0]}${props.nameData.name[1]}`
+        : `${props.nameData.name[1]}${props.nameData.name[0]}`
+    copy_text(text)
+    $q.notify({
+        message: '已复制',
+        position: 'top',
+        color: 'primary',
+    })
+}
 </script>
 
 <template>
   <div
     bg="#1c0d1a"
     text="white center"
-    w="lg:23% md:30% sm:45% 90%"
+    w="lg:22% md:30% sm:45% 90%"
     h="180px"
     m="10"
     p="10"
@@ -36,17 +51,17 @@ const toggle = () => {
       <div
         pst="abs"
         transition-all
+        :data-text="nameData.name[0]"
         :class="{ 'l-50': left, 'r-50': !left }"
-      >
-        {{ nameData.name[0] }}
-      </div>
+        @click="copyText"
+      />
       <div
         pst="abs"
         transition-all
+        :data-text="nameData.name[1]"
         :class="{ 'r-50': left, 'l-50': !left }"
-      >
-        {{ nameData.name[1] }}
-      </div>
+        @click="copyText"
+      />
       <div
         class="i-ic:round-swap-horizontal-circle"
         pst="abs l-150%"
@@ -62,22 +77,39 @@ const toggle = () => {
         :class="{ 'text-red': nameData.name.join('').match(item) }"
       >{{ item }}</span>
     </div>
-    <div>——{{ nameData.author }}[{{ nameData.dynasty }}] 《{{ nameData.title }}》</div>
+    <div hover="pointer">
+      ——{{ nameData.author }}[{{ nameData.dynasty }}] 《{{ nameData.title }}》
+      <q-tooltip
+        class="bg-indigo"
+        :offset="[10, 10]"
+        max-width="200px"
+      >
+        {{ nameData.all }}
+      </q-tooltip>
+    </div>
   </div>
 </template>
 
-<style scoped>
+<style lang="scss">
 .text-red {
-  color: #ec2b24;
+  color: var(--primary);
   font-weight: bold;
   font-size: 20px;
 }
 
 .l-50 {
   left: -50%;
+
+  &::before {
+    content: attr(data-text);
+  }
 }
 
 .r-50 {
   left: 50%;
+
+  &::before {
+    content: attr(data-text);
+  }
 }
 </style>

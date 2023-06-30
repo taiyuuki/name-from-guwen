@@ -27,7 +27,7 @@ function toggleLeftDrawer() {
       </q-toolbar>
     </q-header>
 
-    <q-page-container>
+    <q-page-container class="m-auto w-max-80%">
       <router-view />
     </q-page-container>
   </q-layout>

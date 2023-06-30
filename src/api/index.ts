@@ -10,6 +10,7 @@ export interface GuWen {
 }
 
 export interface Result {
+    all: string
     content: string[]
     title:   string
     author:  string
@@ -17,7 +18,10 @@ export interface Result {
     dynasty: string
 }
 
-export type NameData = GuWen & { name: [string, string] }
+export type NameData = GuWen & {
+    name: [string, string]
+    all:  string
+}
 
 export type Category = 'tangshi' | 'chuci' | 'cifu' | 'gushi' | 'shijing' | 'songci' | 'yuefu'
 
@@ -45,6 +49,7 @@ async function getAll(list: Category[]) {
 async function getGuwen(list: Category[], filter?: string) {
     const data = await getAll(list)
     return data.map(item => {
+        const all = item.content
         const content = item.content
             .replace(/(。|？|！|；)/g, '$1|')
             .replace(/(“|”)/g, '')
@@ -54,6 +59,7 @@ async function getGuwen(list: Category[], filter?: string) {
             .map(s => s.trim())
         return {
             ...item,
+            all,
             author: item.author || '佚名',
             content: filter ? content.filter(s => s.includes(filter)) : content,
         }

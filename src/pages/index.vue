@@ -3,9 +3,13 @@ import type { Category, NameData, Result } from 'src/api'
 import { getGuwen } from 'src/api'
 import { arr_random, throttle } from '@taiyuuki/utils'
 import { removePunctuation } from 'src/utils'
+import { useInstance } from 'src/composables/instance'
+import { QInput } from 'quasar'
 
 const keyword = ref('')
+const ipt = useInstance<typeof QInput>()
 const count = ref(8)
+const $q = useQuasar()
 const category = [
     {
         name: 'tangshi',
@@ -33,7 +37,7 @@ const category = [
     },
     {
         name: 'gushi',
-        lable: '古诗',
+        lable: '古体诗',
     },
 ]
 const checkList = ref<(Category | 'no')[]>(['tangshi', 'songci', 'yuefu', 'cifu', 'shijing', 'chuci', 'gushi'])
@@ -44,8 +48,19 @@ const searchList = computed(() => {
 
 const guwen = ref<NameData[]>([])
 
+const noResult = ref(false)
 function getNameList() {
+    if (ipt.value.hasError) {
+        $q.notify({
+            message: '请输入单个汉字',
+            type: 'error',
+            position: 'top',
+            color: 'negative',
+        })
+        return
+    }
     getGuwen(searchList.value, keyword.value || void 0).then(data => {
+        noResult.value && (noResult.value = false)
         guwen.value.length = 0
         const guwenList = new Set<Result>()
         while (guwenList.size < count.value && guwenList.size < data.length) {
@@ -74,11 +89,14 @@ function getNameList() {
                 content,
                 name: [name_1, name_2],
             })
+            if (guwen.value.length === 0) {
+                noResult.value = true
+            }
         }
     })
 }
 
-const genNames = throttle(getNameList, 500)
+const genNames = throttle(getNameList, 300)
 
 function check(value: Category | 'no') {
     if (value === 'no' && searchList.value.length === 0) {
@@ -93,34 +111,49 @@ function validKeyword(value: string) {
 </script>
 
 <template>
-  <div class="q-gutter-sm">
-    <q-input
-      v-model="keyword"
-      outlined
-      type="text"
-      :rules="[validKeyword]"
-      lazy-rules
-      maxlength="1"
-      label="筛选关键字"
-    />
-    <q-checkbox
-      v-for="(item, i) in category"
-      :key="item.name"
-      v-model="checkList[i]"
-      size="lg"
-      dense
-      :label="item.lable"
-      color="primary"
-      :true-value="item.name"
-      false-value="no"
-      @update:model-value="check"
-    />
+  <div class="q-gutter-sm p-10">
+    <div m="y-20">
+      <q-checkbox
+        v-for="(item, i) in category"
+        :key="item.name"
+        v-model="checkList[i]"
+        size="lg"
+        dense
+        keep-color
+        :label="item.lable"
+        color="primary"
+        :true-value="item.name"
+        false-value="no"
+        class="m-10"
+        @update:model-value="check"
+      />
+    </div>
+    <div
+      flex="row"
+      m="y-20"
+    >
+      <q-input
+        ref="ipt"
+        v-model="keyword"
+        outlined
+        type="text"
+        :rules="[validKeyword]"
+        lazy-rules
+        maxlength="1"
+        label="筛选关键字"
+        class="w-200"
+        @keypress.enter="genNames"
+      />
+      <q-btn
+        color="primary"
+        label="取名"
+        dense
+        size="lg"
+        class="m-x-10 m-b-20"
+        @click="genNames"
+      />
+    </div>
   </div>
-  <q-btn
-    color="primary"
-    label="生成"
-    @click="genNames"
-  />
   <div
     flex="row items-center justify-middle wrap"
     w="max-1600 100%"
@@ -130,5 +163,9 @@ function validKeyword(value: string) {
       :key="index"
       :name-data="nameData"
     />
+
+    <div v-if="noResult">
+      没找到与相关的诗文
+    </div>
   </div>
 </template>

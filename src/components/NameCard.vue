@@ -33,10 +33,11 @@ function copyText() {
 
 <template>
   <div
+    pst="rel"
     bg="#1c0d1a"
     text="white center"
     w="lg:22% md:30% sm:45% 90%"
-    h="180px"
+    h="200"
     m="10"
     p="10"
     border="radius-10"
@@ -44,26 +45,31 @@ function copyText() {
   >
     <div
       pst="rel"
-      w="1.5rem"
-      text="1.5rem bold"
-      display="inline-block"
+      w="100%"
     >
       <div
-        pst="abs"
-        transition-all
-        :data-text="nameData.name[0]"
-        :class="{ 'l-50': left, 'r-50': !left }"
-      />
-      <div
-        pst="abs"
-        transition-all
-        :data-text="nameData.name[1]"
-        :class="{ 'r-50': left, 'l-50': !left }"
-      />
-
+        pst="rel"
+        w="1.5rem"
+        text="1.5rem bold"
+        display="inline-block"
+      >
+        <div
+          pst="abs"
+          transition-all
+          :data-text="nameData.name[0]"
+          :class="{ 'l-50': left, 'r-50': !left }"
+        />
+        <div
+          pst="abs"
+          transition-all
+          :data-text="nameData.name[1]"
+          :class="{ 'r-50': left, 'l-50': !left }"
+        />
+      </div>
       <div
         class="i-ic:round-swap-horizontal-circle"
-        pst="abs l--150% t-100%"
+        text="1.5rem"
+        pst="abs l-5 t-5"
         pointer
         hover="text-var-primary"
         @click="toggle"
@@ -80,7 +86,8 @@ function copyText() {
       </div>
       <div
         class="i-ic:baseline-copy-all"
-        pst="abs l-150%"
+        text="1.5rem"
+        pst="abs r-5 t-5"
         pointer
         hover="text-var-primary"
         @click="copyText"
@@ -103,15 +110,20 @@ function copyText() {
         :class="{ 'text-primary': nameData.name.join('').match(item) }"
       >{{ item }}</span>
     </div>
-    <div hover="pointer">
-      ——{{ nameData.author }}[{{ nameData.dynasty }}] 《{{ nameData.title }}》
-      <q-tooltip
-        class="bg-indigo"
-        :offset="[10, 10]"
-        max-width="200px"
-      >
-        {{ nameData.all }}
-      </q-tooltip>
+    <div pst="abs r-10 b-10">
+      [{{ nameData.dynasty }}]{{ nameData.author }}
+    </div>
+    <div pst="abs r-10 b-30">
+      <div hover="pointer">
+        {{ nameData.title }}
+        <q-tooltip
+          class="bg-indigo"
+          :offset="[10, 10]"
+          max-width="200px"
+        >
+          {{ nameData.all }}
+        </q-tooltip>
+      </div>
     </div>
   </div>
 </template>

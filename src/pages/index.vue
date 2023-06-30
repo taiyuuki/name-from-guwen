@@ -25,7 +25,7 @@ const category = [
     },
     {
         name: 'cifu',
-        lable: '词赋',
+        lable: '辞赋',
     },
     {
         name: 'shijing',

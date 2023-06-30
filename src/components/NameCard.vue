@@ -53,28 +53,54 @@ function copyText() {
         transition-all
         :data-text="nameData.name[0]"
         :class="{ 'l-50': left, 'r-50': !left }"
-        @click="copyText"
       />
       <div
         pst="abs"
         transition-all
         :data-text="nameData.name[1]"
         :class="{ 'r-50': left, 'l-50': !left }"
-        @click="copyText"
       />
+
       <div
         class="i-ic:round-swap-horizontal-circle"
+        pst="abs l--150% t-100%"
+        pointer
+        hover="text-var-primary"
+        @click="toggle"
+      >
+        <q-tooltip
+          class="bg-indigo"
+          anchor="top middle"
+          self="bottom middle"
+          :offset="[10, 10]"
+          max-width="200px"
+        >
+          切换
+        </q-tooltip>
+      </div>
+      <div
+        class="i-ic:baseline-copy-all"
         pst="abs l-150%"
         pointer
-        hover="text-red"
-        @click="toggle"
-      />
+        hover="text-var-primary"
+        @click="copyText"
+      >
+        <q-tooltip
+          class="bg-indigo"
+          anchor="top middle"
+          self="bottom middle"
+          :offset="[10, 10]"
+          max-width="200px"
+        >
+          复制
+        </q-tooltip>
+      </div>
     </div>
     <div m="t-3rem">
       <span
         v-for="(item, index) in textList"
         :key="index"
-        :class="{ 'text-red': nameData.name.join('').match(item) }"
+        :class="{ 'text-primary': nameData.name.join('').match(item) }"
       >{{ item }}</span>
     </div>
     <div hover="pointer">
@@ -91,7 +117,7 @@ function copyText() {
 </template>
 
 <style lang="scss">
-.text-red {
+.text-primary {
   color: var(--primary);
   font-weight: bold;
   font-size: 20px;

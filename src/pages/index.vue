@@ -107,17 +107,20 @@ function validKeyword(value: string) {
       v-for="(item, i) in category"
       :key="item.name"
       v-model="checkList[i]"
+      size="lg"
       dense
       :label="item.lable"
-      color="teal"
+      color="primary"
       :true-value="item.name"
       false-value="no"
       @update:model-value="check"
     />
   </div>
-  <button @click="genNames">
-    生成
-  </button>
+  <q-btn
+    color="primary"
+    label="生成"
+    @click="genNames"
+  />
   <div
     flex="row items-center justify-middle wrap"
     w="max-1600 100%"

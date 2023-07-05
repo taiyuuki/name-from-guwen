@@ -1,8 +1,8 @@
 <script setup lang="ts">
 import type { Category, NameData, Result } from 'src/api'
 import { getGuwen } from 'src/api'
-import { arr_random, throttle } from '@taiyuuki/utils'
-import { removePunctuation } from 'src/utils'
+import { arr_random, math_random_int, throttle } from '@taiyuuki/utils'
+import { getRandomStr, removePunctuation } from 'src/utils'
 import { useInstance } from 'src/composables/instance'
 import { QInput } from 'quasar'
 
@@ -108,6 +108,16 @@ function validKeyword(value: string) {
     const reg = /^[\u4e00-\u9fa5]$/g
     return value === '' || reg.test(value) || '请输入单个汉字'
 }
+
+function changeName(nameData: NameData) {
+    nameData.name[0] = getRandomStr(nameData.content)
+    if (keyword.value === '') {
+        nameData.name[1] = getRandomStr(nameData.content)
+        while (nameData.name[0] === nameData.name[1]) {
+            nameData.name[1] = getRandomStr(nameData.content)
+        }
+    }
+}
 </script>
 
 <template>
@@ -162,6 +172,7 @@ function validKeyword(value: string) {
       v-for="(nameData, index) in guwen"
       :key="index"
       :name-data="nameData"
+      @change="changeName(nameData)"
     />
 
     <div v-if="noResult">

@@ -6,6 +6,8 @@ const props = defineProps<{
     nameData: NameData
 }>()
 
+const emits = defineEmits(['change'])
+
 const $q = useQuasar()
 
 const textList = computed(() => {
@@ -29,6 +31,10 @@ function copyText() {
         color: 'primary',
     })
 }
+
+function changeName() {
+    emits('change')
+}
 </script>
 
 <template>
@@ -46,6 +52,7 @@ function copyText() {
     <div
       pst="rel"
       w="100%"
+      h="100%"
     >
       <div
         pst="rel"
@@ -71,7 +78,7 @@ function copyText() {
         text="1.5rem"
         pst="abs l-5 t-5"
         pointer
-        hover="text-var-primary"
+        active="text-var-primary"
         @click="toggle"
       >
         <q-tooltip
@@ -89,7 +96,7 @@ function copyText() {
         text="1.5rem"
         pst="abs r-5 t-5"
         pointer
-        hover="text-var-primary"
+        active="text-var-primary"
         @click="copyText"
       >
         <q-tooltip
@@ -102,8 +109,26 @@ function copyText() {
           复制
         </q-tooltip>
       </div>
+      <div
+        class="i-ic:round-change-circle"
+        text="1.5rem"
+        pst="abs l-5 b-5"
+        pointer
+        active="text-var-primary"
+        @click="changeName"
+      >
+        <q-tooltip
+          class="bg-indigo"
+          anchor="top middle"
+          self="bottom middle"
+          :offset="[10, 10]"
+          max-width="200px"
+        >
+          更换
+        </q-tooltip>
+      </div>
     </div>
-    <div m="t-3rem">
+    <div pst="abs t-5rem">
       <span
         v-for="(item, index) in textList"
         :key="index"
@@ -114,7 +139,7 @@ function copyText() {
       [{{ nameData.dynasty }}]{{ nameData.author }}
     </div>
     <div pst="abs r-10 b-30">
-      <div hover="pointer">
+      <div active="pointer">
         {{ nameData.title }}
         <q-tooltip
           class="bg-indigo"

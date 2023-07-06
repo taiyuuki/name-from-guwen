@@ -26,7 +26,16 @@ function copyText() {
         : `${props.nameData.name[1]}${props.nameData.name[0]}`
     copy_text(text)
     $q.notify({
-        message: '已复制',
+        message: '已复制名字',
+        position: 'top',
+        color: 'primary',
+    })
+}
+
+function copyAll() {
+    copy_text(props.nameData.all)
+    $q.notify({
+        message: '已复制全文',
         position: 'top',
         color: 'primary',
     })
@@ -139,7 +148,10 @@ function changeName() {
       [{{ nameData.dynasty }}]{{ nameData.author }}
     </div>
     <div pst="abs r-10 b-30">
-      <div active="pointer">
+      <div
+        hover="pointer"
+        @click="copyAll"
+      >
         {{ nameData.title }}
         <q-tooltip
           class="bg-indigo"

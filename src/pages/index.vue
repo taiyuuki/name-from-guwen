@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import type { Category, NameData, Result } from 'src/api'
 import { getGuwen } from 'src/api'
-import { arr_random, math_random_int, throttle } from '@taiyuuki/utils'
+import { arr_random, throttle } from '@taiyuuki/utils'
 import { getRandomStr, removePunctuation } from 'src/utils'
 import { useInstance } from 'src/composables/instance'
 import { QInput } from 'quasar'
@@ -72,7 +72,9 @@ function getNameList() {
             while (content.length <= 2) {
                 content = arr_random(result.content)
             }
-            const text = removePunctuation(content).replaceAll(keyword.value, '').split('')
+            const text = removePunctuation(content)
+                .replaceAll(keyword.value, '')
+                .split('')
             let name_1 = arr_random(text)
             while (name_1 === '') {
                 name_1 = arr_random(text)
@@ -80,9 +82,6 @@ function getNameList() {
             let name_2 = keyword.value === '' ? arr_random(text) : keyword.value
             while (name_1 === name_2) {
                 name_2 = arr_random(text)
-            }
-            if (Math.random() > 0.5) {
-                [name_1, name_2] = [name_2, name_1]
             }
             guwen.value.push({
                 ...result,
@@ -110,7 +109,11 @@ function validKeyword(value: string) {
 }
 
 function changeName(nameData: NameData) {
-    nameData.name[0] = getRandomStr(nameData.content)
+    let name = getRandomStr(nameData.content)
+    while (name === nameData.name[0]) {
+        name = getRandomStr(nameData.content)
+    }
+    nameData.name[0] = name
     if (keyword.value === '') {
         nameData.name[1] = getRandomStr(nameData.content)
         while (nameData.name[0] === nameData.name[1]) {
@@ -142,6 +145,14 @@ function changeName(nameData: NameData) {
       flex="row"
       m="y-20"
     >
+      <q-btn
+        color="primary"
+        label="取名"
+        dense
+        size="lg"
+        class="m-x-10 m-b-20"
+        @click="genNames"
+      />
       <q-input
         ref="ipt"
         v-model="keyword"
@@ -153,14 +164,6 @@ function changeName(nameData: NameData) {
         label="筛选关键字"
         class="w-200"
         @keypress.enter="genNames"
-      />
-      <q-btn
-        color="primary"
-        label="取名"
-        dense
-        size="lg"
-        class="m-x-10 m-b-20"
-        @click="genNames"
       />
     </div>
   </div>

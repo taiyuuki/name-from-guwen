@@ -63,7 +63,7 @@ async function getGuwen(list: Category[], filter?: string) {
             author: item.author || '佚名',
             content: filter ? content.filter(s => s.includes(filter)) : content,
         }
-    }).filter(item => item.content.length)
+    }).filter(item => item.content.length > 0)
 }
 
 export { getGuwen }
